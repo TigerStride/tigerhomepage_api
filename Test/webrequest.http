@@ -1,0 +1,20 @@
+@ContactSvc_HostAddress = http://localhost:7071
+
+POST {{@ContactSvc_HostAddress}}/HttpTriggerContact
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="__RequestVerificationToken"
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="customerEmail"
+
+foo@bar.com
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="customerName"
+
+Mr Grier
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="messageText"
+
+Howdy!
+------WebKitFormBoundary7MA4YWxkTrZu0gW--

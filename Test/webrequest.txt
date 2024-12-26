@@ -1,0 +1,2 @@
+$body = "customerName=John Doe&customerEmail=john.doe@example.com&messageText=Hello!"      
+Invoke-WebRequest -Uri http://localhost:7071/api/HttpTriggerContact -Method POST -Body $body -ContentType "application/x-www-form-urlencoded"                                    
