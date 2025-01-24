@@ -1,23 +1,30 @@
-using System;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using ContactSvc.Dtos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using TigerStride.ContactSvc;
 
-public static class AzureSettings
+/// <summary>
+/// Retrieves secrets from the Azure Key Vault.
+/// </summary>
+public static class AzureSecrets
 {
-    public static async Task<EmailSettings> GetEmailSettingsAsync(ILogger<HttpTriggerContact>  logger, IConfiguration configuration)
+    /// <summary>
+    /// Retrieves Email settings from the Azure Key Vault.
+    /// </summary>
+    /// <param name="logger">The logger instance for logging information and errors.</param>
+    /// <param name="configuration">The configuration instance to access application settings.</param>
+    public static async Task<EmailSettings> GetEmailSettingsAsync(ILogger logger, IConfiguration configuration)
     {
         try
         {
-            // Create a SecretClient using DefaultAzureCredential
             string? keyVaultUrl = configuration["AzureSettings:KeyVaultURL"];
             if (string.IsNullOrEmpty(keyVaultUrl))
             {
                 throw new ArgumentNullException(nameof(keyVaultUrl), "KeyVaultUrl cannot be null or empty.");
             }
+
+            // Create a SecretClient using DefaultAzureCredential
             var client = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
 
             // Fetch the email secrets
@@ -29,20 +36,21 @@ public static class AzureSettings
             emailSettings.SmtpPassword = await GetSecretAsync(client, "MailPwd");
             emailSettings.MailSender = await GetSecretAsync(client, "MailSender");
 
-            Console.WriteLine($"Email settings: Svr:{emailSettings.SmtpServer}, Port:{emailSettings.SmtpPort}, User:{emailSettings.SmtpUsername}");
             logger.LogInformation($"Email settings: Svr:{emailSettings.SmtpServer}, Port:{emailSettings.SmtpPort}, User:{emailSettings.SmtpUsername}");
-            //logger.LogInformation($"Email settings: {emailSettings}");
-
             return emailSettings;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error in GetEmailSettings: {ex.Message}");
             logger.LogError(ex, "Error fetching email parms from Azure.");
             throw;
         }
     }
-
+    /// <summary>
+    /// Retrieves a secret value from Azure Key Vault.
+    /// </summary>
+    /// <param name="client">The SecretClient instance used to interact with Azure Key Vault.</param>
+    /// <param name="secretName">The name of the secret to retrieve.</param>
+    /// <returns>The value of the secret as a string.</returns>
     private static async Task<string> GetSecretAsync(SecretClient client, string secretName)
     {
         KeyVaultSecret secret = await client.GetSecretAsync(secretName);

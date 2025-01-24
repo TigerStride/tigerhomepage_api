@@ -1,3 +1,9 @@
+    /// <summary>
+    /// Implement an Azure Function as the backend of the Tigerstride corporate website.
+    /// For example, to respond to customer inquiries via email.
+    /// </summary>
+
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -21,8 +27,4 @@ var host = new HostBuilder()
     .Build();
 
 host.Run();
-// Application Insights isn't enabled by default. See https://aka.ms/AAt8mw4.
-// builder.Services
-//     .AddApplicationInsightsTelemetryWorkerService()
-//     .ConfigureFunctionsApplicationInsights();
 

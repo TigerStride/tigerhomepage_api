@@ -1,5 +1,8 @@
 namespace ContactSvc.Dtos
 {
+    /// <summary>
+    /// Represents the email information needed to forward the customer's inquiry to the corporate mailbox
+    /// </summary> 
     public class EmailSettings
     {
         public string? SmtpServer { get; set; }
