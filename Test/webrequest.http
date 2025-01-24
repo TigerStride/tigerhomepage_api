@@ -1,4 +1,11 @@
-@ContactSvc_HostAddress = http://localhost:7071
+### RESTClient extension test scripts
+
+@ContactSvc_HostAddress = http://localhost:7157
+
+### Do a health check on the ContactSvc API
+GET {{@ContactSvc_HostAddress}}/HealthCheck
+
+### Test the ContactSvc API
 
 POST {{@ContactSvc_HostAddress}}/HttpTriggerContact
 
