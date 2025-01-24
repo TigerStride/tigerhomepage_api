@@ -4,7 +4,7 @@ name: Deploy to Azure Function App
 
 on:
   push:
-    branches: ["disable_main"]
+    branches: ["main"]
 
 env:
   AZURE_FUNCTIONAPP_NAME: 'TigerContactFn'  # set this to your function app name on Azure
