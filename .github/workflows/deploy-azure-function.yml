@@ -14,7 +14,7 @@ env:
 jobs:
   build-and-deploy:
     runs-on: windows-latest # For Linux, use ubuntu-latest
-    environment: dev
+    environment: production
     steps:
     - name: 'Checkout GitHub Action'
       uses: actions/checkout@v4
@@ -28,6 +28,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           client-id: ${{secrets.AZURE_CLIENT_ID}}
           enable-AzPSSession: true
+          
     - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
       uses: actions/setup-dotnet@v4
       with:
