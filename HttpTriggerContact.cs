@@ -35,7 +35,7 @@ namespace TigerStride.ContactSvc
                 {
                     throw new ArgumentNullException(nameof(_logger));
                 }
-                _logger.LogInformation("----------------Begin Contact Function.--------------------");
+                _logger.LogInformation("----------------Begin Contact Function. V.2.---------------");
 
                 // Log the incoming request data
                 _logger.LogInformation("Request Headers: {Headers}", req.Headers);
@@ -106,6 +106,21 @@ namespace TigerStride.ContactSvc
             finally
             {
                 _logger?.LogInformation("----------------End Contact Function.--------------------");
+            }
+        }
+
+        [Function("CheckHealth")]
+        public IActionResult CheckHealth([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+        {
+            try
+            {
+                _logger.LogInformation("Health check requested.");
+                return new OkObjectResult(new { status = "Healthy" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Health check failed.");
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
     }
