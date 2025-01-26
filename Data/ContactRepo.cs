@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using ContactSvc.Dtos;
+﻿using ContactSvc.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -22,6 +20,11 @@ namespace ContactSvc.Data
             _config = config;
         }
 
+        /// <summary>
+        /// Connect the Entity Framework Core to the database.
+        /// </summary>
+        /// <param name="dbSettings">MySQL database connection settings, from Azure secrets</param>
+        /// <returns>void</returns>
         public void Connect(DBSettings dbSettings)
         {
             try
@@ -42,6 +45,11 @@ namespace ContactSvc.Data
             return;
         }
 
+        /// <summary>
+        /// Create a valid MySQL connection string from the template found in DefaultConnection config
+        /// </summary>
+        /// <param name="dbSettings">MySQL database connection settings, from Azure secrets</param>
+        /// <returns>void</returns>        
         private void CreateConnectionString(DBSettings dbSettings)
         {
             try
@@ -50,12 +58,10 @@ namespace ContactSvc.Data
 
                 _connectionString = _config.GetConnectionString("DefaultConnection")
                     ?? throw new ArgumentNullException("DefaultConnection connection is missing.");
-                
-                // Reconfigure connection to Azure Secret values
+
+                // Reconfigure connection to use Azure Secret values
                 _connectionString = string.Format(_connectionString,
                     dbSettings.ServerName, dbSettings.Port, dbSettings.DatabaseName, dbSettings.UserName, dbSettings.UserPassword);
-
-                _logger.LogInformation($"Connection string created successfully. {_connectionString}");
             }
             catch (Exception ex)
             {
@@ -65,6 +71,11 @@ namespace ContactSvc.Data
             return;
         }
 
+        /// <summary>
+        /// Save the customer message to the database.
+        /// </summary>
+        /// <param name="customerMessage">The inquiry message with the customer's contact info</param>
+        /// <returns>void</returns>
         public async Task SaveCustomerMessageAsync(CustomerMessage customerMessage)
         {
             try

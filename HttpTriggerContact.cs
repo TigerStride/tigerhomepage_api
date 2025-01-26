@@ -46,14 +46,9 @@ namespace TigerStride.ContactSvc
                 }
                 _logger.LogInformation("----------------Begin Contact Function. V.2.---------------");
 
-                // Log the incoming request data
-                _logger.LogInformation("Request Headers: {Headers}", req.Headers);
-                _logger.LogInformation("Request Content-Type: {ContentType}", req.ContentType);
-
                 // Check the expected header
                 string customHeader = req.Headers["X-Custom-Header"].ToString();
                 string allowedHeader = "contact-inquiry";
-                // how can inquire if running in dev mode?  
 
                 // Limit posts from our homepage unless dev
                 if (string.IsNullOrEmpty(customHeader) || !customHeader.StartsWith(allowedHeader))
@@ -85,7 +80,7 @@ namespace TigerStride.ContactSvc
                 _contactRepo.Connect(dBSettings);
                 _logger.LogInformation("Connected.");
                 await _contactRepo.SaveCustomerMessageAsync(customerMessage);
-                _logger.LogInformation("End saving customer message to the database.");
+                _logger.LogInformation("Saved customer message to the database.");
 
                 // // Create the email message
                 // var message = new MimeMessage();
@@ -111,14 +106,14 @@ namespace TigerStride.ContactSvc
                 // await client.SendAsync(message);
                 // await client.DisconnectAsync(true);
 
-                _logger.LogInformation("Email sent successfully.");
-
                 var response = new OkObjectResult(new { message = "Success" });
 
                 // Add CORS header
                 req.HttpContext.Response.Headers.Append("Access-Control-Allow-Origin", "https://www.tigerstridesolutions.com");
                 req.HttpContext.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
                 req.HttpContext.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type");
+
+                _logger.LogInformation("End successful trigger execution.");
 
                 return response;
             }
@@ -133,19 +128,19 @@ namespace TigerStride.ContactSvc
             }
         }
 
-        // [Function("CheckHealth")]
-        // public IActionResult CheckHealth([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
-        // {
-        //     try
-        //     {
-        //         _logger.LogInformation("Health check requested.");
-        //         return new OkObjectResult(new { status = "Healthy" });
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError(ex, "Health check failed.");
-        //         return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-        //     }
-        // }
+        [Function("CheckHealth")]
+        public IActionResult CheckHealth([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+        {
+            try
+            {
+                _logger.LogInformation("Health check requested.");
+                return new OkObjectResult(new { status = "Healthy" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Health check failed.");
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }
