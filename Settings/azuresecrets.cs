@@ -4,17 +4,21 @@ using ContactSvc.Dtos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
+
+namespace ContactSvc.Settings;
+
 /// <summary>
 /// Retrieves secrets from the Azure Key Vault.
 /// </summary>
-public static class AzureSecrets
+public class AzureSecrets : IAzureSecrets
 {
     /// <summary>
     /// Retrieves Email settings from the Azure Key Vault.
     /// </summary>
     /// <param name="logger">The logger instance for logging information and errors.</param>
     /// <param name="configuration">The configuration instance to access application settings.</param>
-    public static async Task<EmailSettings> GetEmailSettingsAsync(ILogger logger, IConfiguration configuration)
+    /// <returns>The email settings as an EmailSettings object.</returns>
+    public async Task<EmailSettings> GetEmailSettingsAsync(ILogger logger, IConfiguration configuration)
     {
         try
         {
@@ -45,6 +49,45 @@ public static class AzureSecrets
             throw;
         }
     }
+
+    /// <summary>
+    /// Retrieves Database settings from the Azure Key Vault.
+    /// </summary>
+    /// <param name="logger">The logger instance for logging information and errors.</param>
+    /// <param name="configuration">The configuration instance to access application settings.</param>
+    /// <returns>The database settings as a DBSettings object.</returns>
+    public async Task<DBSettings> GetDBSettingsAsync(ILogger logger, IConfiguration configuration)
+    {
+        try
+        {
+            string? keyVaultUrl = configuration["AzureSettings:KeyVaultURL"];
+            if (string.IsNullOrEmpty(keyVaultUrl))
+            {
+                throw new ArgumentNullException(nameof(keyVaultUrl), "KeyVaultUrl cannot be null or empty.");
+            }
+
+            // Create a SecretClient using DefaultAzureCredential
+            var client = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
+
+            // Fetch the email secrets
+            logger.LogInformation($"Starting to fetch database settings from Azure {keyVaultUrl}.");
+            DBSettings settings = new DBSettings();
+            settings.ServerName = await GetSecretAsync(client, "DBServer");
+            settings.DatabaseName = await GetSecretAsync(client, "DBName");
+            settings.UserName = await GetSecretAsync(client, "DBUser");
+            settings.UserPassword = await GetSecretAsync(client, "DBPwd");
+
+
+            logger.LogInformation($"Database settings: Svr:{settings.ServerName}, User:{settings.UserName}");
+            return settings;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error fetching database settings from Azure.");
+            throw;
+        }
+    }
+    
     /// <summary>
     /// Retrieves a secret value from Azure Key Vault.
     /// </summary>

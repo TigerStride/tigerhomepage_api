@@ -9,6 +9,7 @@ using ContactSvc.Dtos;
 using System.Threading.Tasks;
 //using MailKit.Security;
 using Microsoft.Extensions.Configuration;
+using ContactSvc.Settings;
 
 namespace TigerStride.ContactSvc
 {
@@ -19,11 +20,18 @@ namespace TigerStride.ContactSvc
     {
         private readonly ILogger<HttpTriggerContact> _logger;  // Serilogger
         private readonly IConfiguration _configuration;
+        private readonly IAzureSecrets _azureSecrets;
+        private readonly ContactRepo _contactRepo;
 
-        public HttpTriggerContact(ILogger<HttpTriggerContact> logger, IConfiguration configuration)
+        public HttpTriggerContact(ILogger<HttpTriggerContact> logger, 
+            IConfiguration configuration, 
+            IAzureSecrets azuresecrets,
+            ContactRepo contactRepo)   
         {
             _logger = logger;
             _configuration = configuration;
+            _azureSecrets = azuresecrets;
+            _contactRepo = contactRepo;
         }
 
         [Function("HttpTriggerContact")]
@@ -60,8 +68,11 @@ namespace TigerStride.ContactSvc
                 _logger.LogInformation($"Customer inquiry: {customerName}, {customerEmail}, {messageText}");
 
                 // Get the email settings
-                EmailSettings emailSettings = await AzureSecrets.GetEmailSettingsAsync(_logger, _configuration);
+                EmailSettings emailSettings = await _azureSecrets.GetEmailSettingsAsync(_logger, _configuration);
                 _logger.LogInformation($"Email settings: Svr:{emailSettings.SmtpServer}, Port:{emailSettings.SmtpPort}, User:{emailSettings.SmtpUsername}");
+
+                // Save customer message to the database
+                await _contactRepo.SaveCustomerMessageAsync(customerMessage);
 
                 // // Create the email message
                 // var message = new MimeMessage();
