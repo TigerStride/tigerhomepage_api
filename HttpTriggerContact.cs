@@ -22,17 +22,17 @@ namespace TigerStride.ContactSvc
         private readonly ILogger<HttpTriggerContact> _logger;  // Serilogger
         private readonly IConfiguration _configuration;
         private readonly IAzureSecrets _azureSecrets;
-        private readonly ContactRepo _contactRepo;
+        //private readonly ContactRepo _contactRepo;
 
         public HttpTriggerContact(ILogger<HttpTriggerContact> logger, 
             IConfiguration configuration, 
-            IAzureSecrets azuresecrets,
-            ContactRepo contactRepo)   
+            IAzureSecrets azuresecrets
+            /*ContactRepo contactRepo*/)   
         {
             _logger = logger;
             _configuration = configuration;
             _azureSecrets = azuresecrets;
-            _contactRepo = contactRepo;
+            // _contactRepo = contactRepo;
         }
 
         [Function("HttpTriggerContact")]
