@@ -76,7 +76,7 @@ namespace TigerStride.ContactSvc
                 _logger.LogInformation($"Customer inquiry: {customerName}, {customerEmail}, {messageText}");
 
                 // Get the email settings
-                EmailSettings emailSettings = await _azureSecrets.GetEmailSettingsAsync(_logger, _configuration);
+                EmailSettings emailSettings = await _azureSecrets.GetEmailSettingsAsync();
                 _logger.LogInformation($"Email settings: Svr:{emailSettings.SmtpServer}, Port:{emailSettings.SmtpPort}, User:{emailSettings.SmtpUsername}");
 
                 // Save customer message to the database

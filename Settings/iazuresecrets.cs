@@ -8,7 +8,7 @@ namespace ContactSvc.Settings
 {
     public interface IAzureSecrets
     {
-        Task<EmailSettings> GetEmailSettingsAsync(ILogger logger, IConfiguration configuration);
-        Task<DBSettings> GetDBSettingsAsync(ILogger logger, IConfiguration configuration);
+        Task<EmailSettings> GetEmailSettingsAsync();
+        Task<DBSettings> GetDBSettingsAsync();
     }
 }
