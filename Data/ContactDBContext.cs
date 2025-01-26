@@ -45,7 +45,6 @@ namespace ContactSvc.Data
                     _connectionString = string.Format(conSetting, 
                         dbSettings.ServerName, dbSettings.DatabaseName, dbSettings.UserName, dbSettings.UserPassword);
 
-                    Database.SetConnectionString(_connectionString);
                     _logger.LogInformation("Connection string created successfully.");
                 }
                 else
