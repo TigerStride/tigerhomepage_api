@@ -12,13 +12,13 @@ namespace ContactSvc.Data
     {
         private readonly IConfiguration _configuration;
         private readonly IAzureSecrets _azureSecrets;
-        private readonly ILogger _logger;
+        private readonly ILogger<ContactDbContext> _logger;
        private string _connectionString = string.Empty;
 
         public ContactDbContext(DbContextOptions<ContactDbContext> options, 
             IConfiguration configuration,
             IAzureSecrets azureSecrets,
-            ILogger logger) : base(options)
+            ILogger<ContactDbContext> logger) : base(options)
         {
             _configuration = configuration;
             _azureSecrets = azureSecrets;
@@ -37,7 +37,7 @@ namespace ContactSvc.Data
             string? conSetting =_configuration.GetConnectionString("DefaultConnection");
             if (conSetting != null)
             {
-                DBSettings dbSettings = _azureSecrets.GetDBSettingsAsync(_logger, _configuration).Result;
+                DBSettings dbSettings = _azureSecrets.GetDBSettingsAsync().Result;
 
                 _connectionString = string.Format(conSetting, 
                     dbSettings.ServerName, dbSettings.DatabaseName, dbSettings.UserName, dbSettings.UserPassword);
