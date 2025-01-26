@@ -35,23 +35,23 @@ var host = new HostBuilder()
 
         logging.AddSerilog(logger);
     })
-    .ConfigureServices((context, services) =>
-    {
-        services.AddSingleton<IAzureSecrets, AzureSecrets>();
-        services.AddDbContext<ContactDbContext>(async (serviceProvider, options) =>
-        {
-            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            var logger = serviceProvider.GetRequiredService<ILogger<ContactDbContext>>();
-            var dbContext = serviceProvider.GetRequiredService<ContactDbContext>();
+    // .ConfigureServices((context, services) =>
+    // {
+    //     services.AddSingleton<IAzureSecrets, AzureSecrets>();
+    //     services.AddDbContext<ContactDbContext>(async (serviceProvider, options) =>
+    //     {
+    //         var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    //         var logger = serviceProvider.GetRequiredService<ILogger<ContactDbContext>>();
+    //         var dbContext = serviceProvider.GetRequiredService<ContactDbContext>();
 
-            var connectionString = await dbContext.CreateConnectionStringAsync();
-            var dbVersion = new MySqlServerVersion(new Version(configuration["DBSettings:MySqlVersion"] ?? "8.0.25"));
-            options.UseMySql(connectionString, dbVersion);
+    //         var connectionString = await dbContext.CreateConnectionStringAsync();
+    //         var dbVersion = new MySqlServerVersion(new Version(configuration["DBSettings:MySqlVersion"] ?? "8.0.25"));
+    //         options.UseMySql(connectionString, dbVersion);
 
-            logger.LogInformation($"Using connection string: {connectionString}");
-        });
-        services.AddScoped<ContactRepo>();
-    })
+    //         logger.LogInformation($"Using connection string: {connectionString}");
+    //     });
+    //     services.AddScoped<ContactRepo>();
+    // })
     .Build();
 
 await host.RunAsync();
