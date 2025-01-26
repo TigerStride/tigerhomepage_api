@@ -40,7 +40,7 @@ var host = new HostBuilder()
         services.AddSingleton<IAzureSecrets, AzureSecrets>();
         services.AddDbContext<ContactDbContext>((serviceProvider, options) =>
         {
-            var connectionString = "Server=myServerAddress;Port=myPort;Database=myDataBase;Uid=myUsername;Pwd=;";
+            var connectionString = "Server=myServerAddress;Port=1212;Database=myDataBase;Uid=myUsername;Pwd=;";
             var dbVersion = new MySqlServerVersion( "8.0.25");
             options.UseMySql(connectionString, dbVersion);
         });

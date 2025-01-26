@@ -86,7 +86,7 @@ public class AzureSecrets : IAzureSecrets
             settings.DatabaseName = await GetSecretAsync(client, "DBName");
             settings.UserName = await GetSecretAsync(client, "DBUser");
             settings.UserPassword = await GetSecretAsync(client, "DBPwd");
-
+            settings.Port = int.TryParse(await GetSecretAsync(client, "DBPort"), out int port) ? port : 1112;
 
             _logger.LogInformation($"Database settings: Svr:{settings.ServerName}, User:{settings.UserName}");
             return settings;

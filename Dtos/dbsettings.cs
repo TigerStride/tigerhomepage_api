@@ -9,5 +9,6 @@ namespace ContactSvc.Dtos
         public string? UserName { get; set; }
         public string? UserPassword { get; set; }
         public string? ServerName { get; set; }
+        public int? Port { get; set; }
     }
 }
