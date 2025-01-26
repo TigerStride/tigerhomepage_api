@@ -34,13 +34,13 @@ var host = new HostBuilder()
     {
         services.AddSingleton<IAzureSecrets, AzureSecrets>();
         services.AddScoped<ContactRepo>();
-        services.AddDbContext<ContactDbContext>((serviceProvider, options) =>
+        services.AddDbContext<ContactDbContext>(async (serviceProvider, options) =>
         {
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             var logger = serviceProvider.GetRequiredService<ILogger<ContactDbContext>>();
             var dbContext = serviceProvider.GetRequiredService<ContactDbContext>();
 
-            var connectionString = dbContext.CreateConnectionString();
+            var connectionString = await dbContext.CreateConnectionStringAsync();
             var dbVersion = new MySqlServerVersion(new Version(configuration["DBSettings:MySqlVersion"] ?? "8.0.25"));
             options.UseMySql(connectionString, dbVersion);
 

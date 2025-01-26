@@ -1,10 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ContactSvc.Dtos;
 using ContactSvc.Settings;
-using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 
 namespace ContactSvc.Data
 {
@@ -13,7 +12,7 @@ namespace ContactSvc.Data
         private readonly IConfiguration _configuration;
         private readonly IAzureSecrets _azureSecrets;
         private readonly ILogger<ContactDbContext> _logger;
-       private string _connectionString = string.Empty;
+        private string _connectionString = string.Empty;
 
         public ContactDbContext(DbContextOptions<ContactDbContext> options, 
             IConfiguration configuration,
@@ -32,17 +31,32 @@ namespace ContactSvc.Data
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContactDbContext).Assembly);
         }
 
-        public string CreateConnectionString()
+        public async Task<string> CreateConnectionStringAsync()
         {
-            string? conSetting =_configuration.GetConnectionString("DefaultConnection");
-            if (conSetting != null)
+            try
             {
-                DBSettings dbSettings = _azureSecrets.GetDBSettingsAsync().Result;
+                _logger.LogInformation("Creating connection string...");
+                string? conSetting = _configuration.GetConnectionString("DefaultConnection");
+                if (conSetting != null)
+                {
+                    _logger.LogInformation("Fetching database settings from Azure Key Vault...");
+                    DBSettings dbSettings = await _azureSecrets.GetDBSettingsAsync();
 
-                _connectionString = string.Format(conSetting, 
-                    dbSettings.ServerName, dbSettings.DatabaseName, dbSettings.UserName, dbSettings.UserPassword);
+                    _connectionString = string.Format(conSetting, 
+                        dbSettings.ServerName, dbSettings.DatabaseName, dbSettings.UserName, dbSettings.UserPassword);
 
-                Database.SetConnectionString(_connectionString);
+                    Database.SetConnectionString(_connectionString);
+                    _logger.LogInformation("Connection string created successfully.");
+                }
+                else
+                {
+                    _logger.LogWarning("DefaultConnection setting is null.");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating connection string.");
+                throw;
             }
             return _connectionString;
         }
