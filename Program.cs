@@ -50,7 +50,7 @@ var host = new HostBuilder()
 
             logger.LogInformation($"Using connection string: {connectionString}");
         });
-        //     services.AddScoped<ContactRepo>();
+        services.AddScoped<ContactRepo>();
     })
     .Build();
 

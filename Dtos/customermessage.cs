@@ -11,7 +11,7 @@ namespace ContactSvc.Dtos
     {
         [Key]
         [Column("Id")]
-        internal readonly int? Id = 0;
+        internal readonly int? Id = null;
 
         [Column("customerEmail")]
         public string? customerEmail { get; set; }
