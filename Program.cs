@@ -38,17 +38,11 @@ var host = new HostBuilder()
     .ConfigureServices((context, services) =>
     {
         services.AddSingleton<IAzureSecrets, AzureSecrets>();
-        services.AddDbContext<ContactDbContext>(async (serviceProvider, options) =>
+        services.AddDbContext<ContactDbContext>((serviceProvider, options) =>
         {
-            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            var logger = serviceProvider.GetRequiredService<ILogger<ContactDbContext>>();
-            var dbContext = serviceProvider.GetRequiredService<ContactDbContext>();
-
-            var connectionString = await dbContext.CreateConnectionStringAsync();
-            var dbVersion = new MySqlServerVersion(new Version(configuration["DBSettings:MySqlVersion"] ?? "8.0.25"));
+            var connectionString = "to be overridden";
+            var dbVersion = new MySqlServerVersion( "8.0.25");
             options.UseMySql(connectionString, dbVersion);
-
-            logger.LogInformation($"Using connection string: {connectionString}");
         });
         services.AddScoped<ContactRepo>();
     })

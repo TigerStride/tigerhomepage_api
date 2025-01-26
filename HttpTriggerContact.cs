@@ -22,17 +22,17 @@ namespace TigerStride.ContactSvc
         private readonly ILogger<HttpTriggerContact> _logger;  // Serilogger
         private readonly IConfiguration _configuration;
         private readonly IAzureSecrets _azureSecrets;
-        //private readonly ContactRepo _contactRepo;
+        private readonly ContactRepo _contactRepo;
 
-        public HttpTriggerContact(ILogger<HttpTriggerContact> logger, 
-            IConfiguration configuration, 
-            IAzureSecrets azuresecrets
-            /*ContactRepo contactRepo*/)   
+        public HttpTriggerContact(ILogger<HttpTriggerContact> logger,
+            IConfiguration configuration,
+            IAzureSecrets azuresecrets,
+            ContactRepo contactRepo)
         {
             _logger = logger;
             _configuration = configuration;
             _azureSecrets = azuresecrets;
-            // _contactRepo = contactRepo;
+            _contactRepo = contactRepo;
         }
 
         [Function("HttpTriggerContact")]
@@ -80,7 +80,12 @@ namespace TigerStride.ContactSvc
                 _logger.LogInformation($"Email settings: Svr:{emailSettings.SmtpServer}, Port:{emailSettings.SmtpPort}, User:{emailSettings.SmtpUsername}");
 
                 // Save customer message to the database
-                // await _contactRepo.SaveCustomerMessageAsync(customerMessage);
+                _logger.LogInformation($"Begin saving customer message to the database. {customerMessage}");
+                DBSettings dBSettings = await _azureSecrets.GetDBSettingsAsync();
+                _contactRepo.Connect(dBSettings);
+                _logger.LogInformation("Connected.");
+                await _contactRepo.SaveCustomerMessageAsync(customerMessage);
+                _logger.LogInformation("End saving customer message to the database.");
 
                 // // Create the email message
                 // var message = new MimeMessage();

@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using ContactSvc.Dtos;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace ContactSvc.Data
@@ -8,11 +11,52 @@ namespace ContactSvc.Data
     {
         private readonly ContactDbContext _context;
         private readonly ILogger<ContactRepo> _logger;
+        private readonly IConfiguration _config;
 
-        public ContactRepo(ContactDbContext context, ILogger<ContactRepo> logger)
+        private string _connectionString = string.Empty;
+
+        public ContactRepo(ContactDbContext context, IConfiguration config, ILogger<ContactRepo> logger)
         {
             _context = context;
             _logger = logger;
+            _config = config;
+        }
+
+        public void Connect(DBSettings dbSettings)
+        {
+            try
+            {
+                _logger.LogInformation("Connecting to the database...");
+                if (string.IsNullOrEmpty(_connectionString))
+                {
+                    CreateConnectionString(dbSettings);
+                    _context.Database.SetConnectionString(_connectionString);
+                }
+                _logger.LogInformation("Connected to the database successfully.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error connecting to the database.");
+                throw;
+            }
+            return;
+        }
+
+        private void CreateConnectionString(DBSettings dbSettings)
+        {
+            try
+            {
+                _logger.LogInformation("Creating connection string...");
+                _connectionString = _config.GetConnectionString("DefaultConnection")
+                    ?? throw new ArgumentNullException("DefaultConnection connection is missing.");
+                _logger.LogInformation("Connection string created successfully.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating connection string.");
+                throw;
+            }
+            return;
         }
 
         public async Task SaveCustomerMessageAsync(CustomerMessage customerMessage)

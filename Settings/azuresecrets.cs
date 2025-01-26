@@ -50,7 +50,7 @@ public class AzureSecrets : IAzureSecrets
             emailSettings.SmtpPassword = await GetSecretAsync(client, "MailPwd");
             emailSettings.MailSender = await GetSecretAsync(client, "MailSender");
 
-            _logger.LogInformation($"Email settings: Svr:{emailSettings.SmtpServer}, Port:{emailSettings.SmtpPort}, User:{emailSettings.SmtpUsername}");
+            _logger.LogInformation($"Email settings finished.");
             return emailSettings;
         }
         catch (Exception ex)
