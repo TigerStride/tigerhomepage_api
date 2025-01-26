@@ -33,6 +33,7 @@ var host = new HostBuilder()
     .ConfigureServices((context, services) =>
     {
         services.AddSingleton<IAzureSecrets, AzureSecrets>();
+        services.AddScoped<ContactRepo>();
         services.AddDbContext<ContactDbContext>((serviceProvider, options) =>
         {
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
