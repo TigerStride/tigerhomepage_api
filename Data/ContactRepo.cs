@@ -47,9 +47,15 @@ namespace ContactSvc.Data
             try
             {
                 _logger.LogInformation("Creating connection string...");
+
                 _connectionString = _config.GetConnectionString("DefaultConnection")
                     ?? throw new ArgumentNullException("DefaultConnection connection is missing.");
-                _logger.LogInformation("Connection string created successfully.");
+                
+                // Reconfigure connection to Azure Secret values
+                _connectionString = string.Format(_connectionString,
+                    dbSettings.ServerName, dbSettings.Port, dbSettings.DatabaseName, dbSettings.UserName, dbSettings.UserPassword);
+
+                _logger.LogInformation($"Connection string created successfully. {_connectionString}");
             }
             catch (Exception ex)
             {
