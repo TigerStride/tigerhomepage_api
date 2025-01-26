@@ -80,7 +80,7 @@ namespace TigerStride.ContactSvc
                 _logger.LogInformation($"Email settings: Svr:{emailSettings.SmtpServer}, Port:{emailSettings.SmtpPort}, User:{emailSettings.SmtpUsername}");
 
                 // Save customer message to the database
-                await _contactRepo.SaveCustomerMessageAsync(customerMessage);
+                // await _contactRepo.SaveCustomerMessageAsync(customerMessage);
 
                 // // Create the email message
                 // var message = new MimeMessage();
