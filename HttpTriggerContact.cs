@@ -53,7 +53,6 @@ namespace TigerStride.ContactSvc
                 // Check the expected header
                 string customHeader = req.Headers["X-Custom-Header"].ToString();
                 string allowedHeader = "contact-inquiry";
-                // how can inquire if running in dev mode?  
 
                 // Limit posts from our homepage unless dev
                 if (string.IsNullOrEmpty(customHeader) || !customHeader.StartsWith(allowedHeader))
@@ -111,8 +110,6 @@ namespace TigerStride.ContactSvc
                 // await client.SendAsync(message);
                 // await client.DisconnectAsync(true);
 
-                _logger.LogInformation("Email sent successfully.");
-
                 var response = new OkObjectResult(new { message = "Success" });
 
                 // Add CORS header
@@ -120,6 +117,7 @@ namespace TigerStride.ContactSvc
                 req.HttpContext.Response.Headers.Append("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
                 req.HttpContext.Response.Headers.Append("Access-Control-Allow-Headers", "Content-Type");
 
+                _logger.LogInformation("Successful trigger execution.");
                 return response;
             }
             catch (Exception ex)
@@ -133,19 +131,19 @@ namespace TigerStride.ContactSvc
             }
         }
 
-        // [Function("CheckHealth")]
-        // public IActionResult CheckHealth([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
-        // {
-        //     try
-        //     {
-        //         _logger.LogInformation("Health check requested.");
-        //         return new OkObjectResult(new { status = "Healthy" });
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         _logger.LogError(ex, "Health check failed.");
-        //         return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-        //     }
-        // }
+        [Function("CheckHealth")]
+        public IActionResult CheckHealth([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+        {
+            try
+            {
+                _logger.LogInformation("Health check requested.");
+                return new OkObjectResult(new { status = "Healthy" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Health check failed.");
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }
