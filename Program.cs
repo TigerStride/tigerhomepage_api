@@ -1,7 +1,7 @@
-    /// <summary>
-    /// Implement an Azure Function as the backend of the Tigerstride corporate website.
-    /// For example, to respond to customer inquiries via email.
-    /// </summary>
+/// <summary>
+/// Implement an Azure Function as the backend of the Tigerstride corporate website.
+/// For example, to respond to customer inquiries via email.
+/// </summary>
 
 
 using Microsoft.Extensions.Configuration;
@@ -20,6 +20,11 @@ var host = new HostBuilder()
         config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables();
+
+        if (context.HostingEnvironment.IsDevelopment())
+        {
+            config.AddUserSecrets<Program>();
+        }
     })
     .ConfigureFunctionsWebApplication()
     .ConfigureLogging((context, logging) =>
@@ -49,5 +54,5 @@ var host = new HostBuilder()
     })
     .Build();
 
-host.Run();
+await host.RunAsync();
 
