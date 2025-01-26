@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 //using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using ContactSvc.Settings;
+using ContactSvc.Data;
 
 namespace TigerStride.ContactSvc
 {
@@ -64,6 +65,13 @@ namespace TigerStride.ContactSvc
                 var customerName = form["customerName"];
                 var customerEmail = form["customerEmail"];
                 var messageText = form["messageText"];
+
+                var customerMessage = new CustomerMessage
+                {
+                    customerName = customerName,
+                    customerEmail = customerEmail,
+                    messageText = messageText
+                };
 
                 _logger.LogInformation($"Customer inquiry: {customerName}, {customerEmail}, {messageText}");
 
