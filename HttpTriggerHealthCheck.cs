@@ -2,20 +2,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using ContactSvc.Dtos;
-// using MailKit.Net.Smtp;
-// using MimeKit;
-// using Microsoft.Identity.Client;
-using System.Threading.Tasks;
-//using MailKit.Security;
-using Microsoft.Extensions.Configuration;
-using ContactSvc.Settings;
-using ContactSvc.Data;
 
 namespace TigerStride.ContactSvc
 {
     /// <summary>
-    /// Implement the HttpTrigger for an Azure Function that responds to the POST of the contact form on the corporate homepage.
+    /// CheckHealth endpoint for the Contact Service.
     /// </summary> 
     public partial class HttpTriggerContact
     {
