@@ -17,7 +17,7 @@ namespace TigerStride.ContactSvc
     /// <summary>
     /// Implement the HttpTrigger for an Azure Function that responds to the POST of the contact form on the corporate homepage.
     /// </summary> 
-    public class HttpTriggerContact
+    public partial class HttpTriggerContact
     {
         private readonly ILogger<HttpTriggerContact> _logger;  // Serilogger
         private readonly IConfiguration _configuration;
@@ -44,11 +44,7 @@ namespace TigerStride.ContactSvc
                 {
                     throw new ArgumentNullException(nameof(_logger));
                 }
-                _logger.LogInformation("----------------Begin Contact Function. V.2.---------------");
-
-                // Log the incoming request data
-                _logger.LogInformation("Request Headers: {Headers}", req.Headers);
-                _logger.LogInformation("Request Content-Type: {ContentType}", req.ContentType);
+                _logger.LogInformation("----------------Begin Contact Function. -------------------");
 
                 // Check the expected header
                 string customHeader = req.Headers["X-Custom-Header"].ToString();
@@ -128,21 +124,6 @@ namespace TigerStride.ContactSvc
             finally
             {
                 _logger?.LogInformation("----------------End Contact Function.--------------------");
-            }
-        }
-
-        [Function("CheckHealth")]
-        public IActionResult CheckHealth([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
-        {
-            try
-            {
-                _logger.LogInformation("Health check requested.");
-                return new OkObjectResult(new { status = "Healthy" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Health check failed.");
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
         }
     }
