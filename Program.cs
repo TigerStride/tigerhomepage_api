@@ -34,6 +34,9 @@ var host = new HostBuilder()
             .CreateLogger();
 
         logging.AddSerilog(logger);
+        
+        // Test log message
+        logger.Information("Application starting up. Testing log configuration.");
     })
     .ConfigureServices((context, services) =>
     {
