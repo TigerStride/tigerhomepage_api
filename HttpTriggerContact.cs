@@ -113,27 +113,65 @@ namespace TigerStride.ContactSvc
         /// <param name="customerMessage">The customer's contact form submission.</param>
         private async Task SendContactFormEmailAsync(EmailSettings emailSettings, CustomerMessage customerMessage)
         {
-            _logger.LogInformation("Creating email message...");
-            var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("Tigerstride Contact Form", emailSettings.MailSender));
-            message.To.Add(new MailboxAddress("Tigerstride Support", emailSettings.MailSender));
-            message.Subject = $"New Contact Form Submission from {customerMessage.customerName}";
-
-            var bodyBuilder = new BodyBuilder
+            try
             {
-                TextBody = $"Name: {customerMessage.customerName}\nEmail: {customerMessage.customerEmail}\n\nMessage:\n{customerMessage.messageText}"
-            };
-            message.Body = bodyBuilder.ToMessageBody();
+                _logger.LogInformation("Creating email message...");
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress("Tigerstride Contact Form", emailSettings.MailSender));
+                message.To.Add(new MailboxAddress("Tigerstride Support", emailSettings.MailSender));
+                message.Subject = $"New Contact Form Submission from {customerMessage.customerName}";
 
-            _logger.LogInformation("Sending email...");
-            using (var client = new SmtpClient())
-            {
-                await client.ConnectAsync(emailSettings.SmtpServer, emailSettings.SmtpPort, SecureSocketOptions.StartTls);
-                await client.AuthenticateAsync(emailSettings.SmtpUsername, emailSettings.SmtpPassword);
-                await client.SendAsync(message);
-                await client.DisconnectAsync(true);
+                var bodyBuilder = new BodyBuilder
+                {
+                    TextBody = $"Name: {customerMessage.customerName}\nEmail: {customerMessage.customerEmail}\n\nMessage:\n{customerMessage.messageText}"
+                };
+                message.Body = bodyBuilder.ToMessageBody();
+
+                _logger.LogInformation("Sending email...");
+                using (var client = new SmtpClient())
+                {
+                    try
+                    {
+                        _logger.LogInformation($"Attempting to connect to SMTP server: {emailSettings.SmtpServer}:{emailSettings.SmtpPort}");
+                        await client.ConnectAsync(emailSettings.SmtpServer, emailSettings.SmtpPort, SecureSocketOptions.StartTls);
+                        
+                        _logger.LogInformation("SMTP connection successful, attempting authentication...");
+                        await client.AuthenticateAsync(emailSettings.SmtpUsername, emailSettings.SmtpPassword);
+                        
+                        _logger.LogInformation("Authentication successful, sending message...");
+                        await client.SendAsync(message);
+                        
+                        _logger.LogInformation("Message sent successfully, disconnecting...");
+                        await client.DisconnectAsync(true);
+                        _logger.LogInformation("Email sent successfully.");
+                    }
+                    catch (SmtpCommandException ex)
+                    {
+                        _logger.LogError(ex, $"SMTP command error: {ex.Message}, StatusCode: {ex.StatusCode}");
+                        throw;
+                    }
+                    catch (SmtpProtocolException ex)
+                    {
+                        _logger.LogError(ex, $"SMTP protocol error: {ex.Message}");
+                        throw;
+                    }
+                    catch (AuthenticationException ex)
+                    {
+                        _logger.LogError(ex, $"SMTP authentication error: {ex.Message}");
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, $"Unexpected error during email sending: {ex.Message}");
+                        throw;
+                    }
+                }
             }
-            _logger.LogInformation("Email sent successfully.");
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to send email for contact form submission from {customerMessage.customerName} ({customerMessage.customerEmail})");
+                throw;
+            }
         }
     }
 }
