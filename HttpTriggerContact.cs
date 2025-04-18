@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using ContactSvc.Dtos;
-// using MailKit.Net.Smtp;
-// using MimeKit;
+using MailKit.Net.Smtp;
+using MimeKit;
 // using Microsoft.Identity.Client;
 using System.Threading.Tasks;
-//using MailKit.Security;
+using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using ContactSvc.Settings;
 using ContactSvc.Data;
@@ -82,29 +82,8 @@ namespace TigerStride.ContactSvc
                 await _contactRepo.SaveCustomerMessageAsync(customerMessage);
                 _logger.LogInformation("End saving customer message to the database.");
 
-                // // Create the email message
-                // var message = new MimeMessage();
-                // message.From.Add(new MailboxAddress("CompanyName", emailSettings.MailSender));
-                // message.To.Add(new MailboxAddress(customerName, customerEmail));
-                // message.Subject = "Customer Inquiry";
-                // message.Body = new TextPart("plain")
-                // {
-                //     Text = $"Name: {customerName}\nEmail: {customerEmail}\nMessage: {messageText}"
-                // };
-
-                // // Authenticate using OAuth 2.0
-                // var cca = ConfidentialClientApplicationBuilder.Create("clientId")
-                //     .WithClientSecret("clientSecret")
-                //     .WithAuthority(new Uri($"https://login.microsoftonline.com/tenantId"))
-                //     .Build();
-
-                // var result = await cca.AcquireTokenForClient(new[] { "https://outlook.office365.com/.default" }).ExecuteAsync();
-
-                // using var client = new SmtpClient();
-                // await client.ConnectAsync(emailSettings.SmtpServer, emailSettings.SmtpPort, SecureSocketOptions.StartTls);
-                // await client.AuthenticateAsync(new SaslMechanismOAuth2(emailSettings.SmtpUsername, result.AccessToken));
-                // await client.SendAsync(message);
-                // await client.DisconnectAsync(true);
+                // Send email notification
+                await SendContactFormEmailAsync(emailSettings, customerMessage);
 
                 var response = new OkObjectResult(new { message = "Success" });
 
@@ -125,6 +104,36 @@ namespace TigerStride.ContactSvc
             {
                 _logger?.LogInformation("----------------End Contact Function.--------------------");
             }
+        }
+
+        /// <summary>
+        /// Sends an email notification for a new contact form submission.
+        /// </summary>
+        /// <param name="emailSettings">The email configuration settings.</param>
+        /// <param name="customerMessage">The customer's contact form submission.</param>
+        private async Task SendContactFormEmailAsync(EmailSettings emailSettings, CustomerMessage customerMessage)
+        {
+            _logger.LogInformation("Creating email message...");
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("Tigerstride Contact Form", emailSettings.MailSender));
+            message.To.Add(new MailboxAddress("Tigerstride Support", emailSettings.MailSender));
+            message.Subject = $"New Contact Form Submission from {customerMessage.customerName}";
+
+            var bodyBuilder = new BodyBuilder
+            {
+                TextBody = $"Name: {customerMessage.customerName}\nEmail: {customerMessage.customerEmail}\n\nMessage:\n{customerMessage.messageText}"
+            };
+            message.Body = bodyBuilder.ToMessageBody();
+
+            _logger.LogInformation("Sending email...");
+            using (var client = new SmtpClient())
+            {
+                await client.ConnectAsync(emailSettings.SmtpServer, emailSettings.SmtpPort, SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(emailSettings.SmtpUsername, emailSettings.SmtpPassword);
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+            }
+            _logger.LogInformation("Email sent successfully.");
         }
     }
 }
