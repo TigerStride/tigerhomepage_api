@@ -121,6 +121,8 @@ namespace TigerStride.ContactSvc
                 message.To.Add(new MailboxAddress("Tigerstride Support", emailSettings.MailSender));
                 message.Subject = $"New Contact Form Submission from {customerMessage.customerName}";
 
+                _logger.LogInformation($"About to send email: From: {emailSettings.MailSender}, To: {emailSettings.MailSender}, Subject: {message.Subject}");
+
                 var bodyBuilder = new BodyBuilder
                 {
                     TextBody = $"Name: {customerMessage.customerName}\nEmail: {customerMessage.customerEmail}\n\nMessage:\n{customerMessage.messageText}"
